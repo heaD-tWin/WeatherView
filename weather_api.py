@@ -1,8 +1,15 @@
-import requests
+﻿import requests
 import os
+import sys
 from dotenv import load_dotenv
 import datetime
 from collections import defaultdict
+
+
+if getattr(sys, 'frozen', False):
+    env_path = os.path.join(os.path.dirname(sys.executable), ".env")
+else:
+    env_path = ".env"
 
 load_dotenv()
 API_KEY = API_KEY = os.getenv("OPENWEATHER_API_KEY")
@@ -42,6 +49,7 @@ def get_weather_by_city(city, unit_var):
     except Exception as e:
         return {"error": "Request failed."}
 
+
 def get_forecast_by_city(city, unit_var):
     unit = unit_var
     url = f"https://api.openweathermap.org/data/2.5/forecast?q={city}&appid={API_KEY}&units={unit}"
@@ -66,8 +74,17 @@ def get_forecast_by_city(city, unit_var):
             if date_str not in daily_entries or time_diff < daily_entries[date_str][0]:
                 daily_entries[date_str] = (time_diff, entry)
 
+        today_utc = datetime.datetime.now(datetime.timezone.utc).date()
+
         daily_forecasts = []
         for date, (_, entry) in daily_entries.items():
+            forecast_date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+            if forecast_date < today_utc:
+                continue
+
+            if date not in min_max_by_date:
+                continue
+
             daily_forecasts.append({
                 "date": date,
                 "temperature": round(entry["main"]["temp"], 1),
@@ -80,6 +97,7 @@ def get_forecast_by_city(city, unit_var):
         return daily_forecasts
 
     except Exception as e:
+        print(f"Exception in get_forecast_by_city: {e}")
         return {"error": str(e)}
 
 def get_detailed_forecast_by_city(city, unit_var):

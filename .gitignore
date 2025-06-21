@@ -198,3 +198,9 @@ cython_debug/
 
 #API key and User email
 .env
+
+#Favourites File
+favourites.json
+
+#Ignore any exported executable
+.exe

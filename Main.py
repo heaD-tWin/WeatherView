@@ -8,7 +8,7 @@ from ui_components import build_ui, handle_search, start_auto_refresh, focus_sea
 from geolocation import get_user_city
 from favourites import  load_favourites
 from utils import on_save_favourite, update_fav_button
-    
+ 
 def on_select_favourite(ui, unit_var):
     selected_city = ui["favourites_dropdown"].get()
     if selected_city:

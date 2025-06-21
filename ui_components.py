@@ -2,7 +2,8 @@
 import tkinter as tk
 from tkinter import ttk
 import os
-import datetime
+import sys
+from datetime import datetime, timezone
 from PIL import Image, ImageTk
 from weather_api import get_weather_by_city, get_forecast_by_city, get_detailed_forecast_by_city
 from themes import set_dynamic_background
@@ -47,7 +48,6 @@ def handle_search(ui, unit_var):
                     ui["icon_label"].config(image="")
             else:
                 ui["icon_label"].config(image="")
-
         forecast = get_forecast_by_city(city, unit)
         container = ui["forecast_cards_container"]
         detailed_forecast = get_detailed_forecast_by_city(city, unit)
@@ -84,7 +84,7 @@ def handle_search(ui, unit_var):
 
                 try:
                     icon_code = day['icon']
-                    icon_path = os.path.join("weather_icons", f"{icon_code}.png")
+                    icon_path = resource_path(os.path.join("weather_icons", f"{icon_code}.png"))
                     img = Image.open(icon_path).resize((60, 60), Image.LANCZOS)
                     icon_img = ImageTk.PhotoImage(img)
                     forecast_icons.append(icon_img)
@@ -146,7 +146,7 @@ def build_ui(parent, unit_var):
     parent.resizable(False, False)
 
     try:
-        icon_path = "weather_icons/logo.png"
+        icon_path = resource_path(os.path.join("weather_icons", f"{icon_code}.png"))
         icon_image = Image.open(icon_path)
         icon_photo = ImageTk.PhotoImage(icon_image)
         parent.iconphoto(False, icon_photo)
@@ -274,7 +274,7 @@ def reset_auto_refresh(ui, unit_var, interval_ms=900000):
 
 def load_weather_icon(icon_code, size=(150, 150)):
     try:
-        icon_path = os.path.join("weather_icons", f"{icon_code}.png")
+        icon_path = resource_path(os.path.join("weather_icons", f"{icon_code}.png"))
         if not os.path.exists(icon_path):
             icon_path = os.path.join("weather_icons", "default.png")
         image = Image.open(icon_path).resize(size, Image.LANCZOS)
@@ -303,4 +303,8 @@ def focus_search_entry(ui_refs):
     ui_refs["search_entry"].selection_range(0, tk.END)
     ui_refs["search_entry_highlighted"] = False
 
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 

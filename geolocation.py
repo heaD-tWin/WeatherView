@@ -1,7 +1,13 @@
 import requests
 import certifi
 import os
+import sys
 from dotenv import load_dotenv
+
+if getattr(sys, 'frozen', False):
+    env_path = os.path.join(os.path.dirname(sys.executable), ".env")
+else:
+    env_path = ".env"
 
 load_dotenv()
 EMAIL = os.getenv("GEOPY_USER_AGENT_EMAIL")

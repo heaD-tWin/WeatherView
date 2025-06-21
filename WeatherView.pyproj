@@ -35,13 +35,9 @@
     <Compile Include="weather_api.py" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="assets\" />
-    <Folder Include="assets\icons\" />
-    <Folder Include="assets\backgrounds\" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="requirements.txt" />
     <Content Include="README.md" />
+    <Content Include="LICENSE" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="venv\">
