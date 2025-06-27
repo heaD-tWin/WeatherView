@@ -83,7 +83,7 @@ def handle_search(ui, unit_var):
                     card.grid(row=0, column=i, padx=5, pady=5)
 
                     try:
-                        date_obj = datetime.datetime.strptime(day["date"], "%Y-%m-%d")
+                        date_obj = datetime.strptime(day["date"], "%Y-%m-%d") 
                         day_name = date_obj.strftime("%A")
                         ttk.Label(card, text=day_name, font=("Segoe UI", 13, "bold")).pack(anchor="w", padx=5)
                         ttk.Label(card, text=day["date"], font=("Segoe UI", 10)).pack(anchor="w", padx=5)
