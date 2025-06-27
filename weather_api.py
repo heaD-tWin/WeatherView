@@ -1,6 +1,7 @@
 ﻿import requests
 import os
 import sys
+from logger import logger
 from dotenv import load_dotenv
 import datetime
 from collections import defaultdict
@@ -14,7 +15,8 @@ else:
 load_dotenv()
 API_KEY = API_KEY = os.getenv("OPENWEATHER_API_KEY")
 if not API_KEY:
-    raise ValueError("OPENWEATHER_API_KEY is not set in your .env file.")
+    logger.error("OPENWEATHER_API_KEY is not set in your .env file")
+    raise ValueError("OPENWEATHER_API_KEY is not set in your .env file")
 
 def get_weather_by_city(city, unit_var):
     unit = unit_var
@@ -24,6 +26,7 @@ def get_weather_by_city(city, unit_var):
         data = response.json()
         
         if data.get("cod") != 200:
+            logger.error("Could not find location in get_weather_by_city")
             return {"error": "Location not found."}
 
         timestamp = data.get("dt")
@@ -47,6 +50,7 @@ def get_weather_by_city(city, unit_var):
             "time": time
         }
     except Exception as e:
+        logger.error("API request failed in get_weather_by_city")
         return {"error": "Request failed."}
 
 
@@ -59,6 +63,7 @@ def get_forecast_by_city(city, unit_var):
         data = response.json()
 
         if response.status_code != 200 or "list" not in data:
+            logger.error(data.get("message", "Unknown error."))
             return {"error": data.get("message", "Unknown error.")}
 
         forecast_list = data["list"]
@@ -97,7 +102,7 @@ def get_forecast_by_city(city, unit_var):
         return daily_forecasts
 
     except Exception as e:
-        print(f"Exception in get_forecast_by_city: {e}")
+        logger.error(f"Exception in get_forecast_by_city: {e}")
         return {"error": str(e)}
 
 def get_detailed_forecast_by_city(city, unit_var):
@@ -109,7 +114,8 @@ def get_detailed_forecast_by_city(city, unit_var):
         data = response.json()
 
         if response.status_code != 200 or "list" not in data:
-            return {"error": data.get("message", "Unknown error.")}
+            logger.error(data.get("message", "Unknown error."))
+            return {"error": data.get("message", "Unknown error.")} 
 
         forecast_points = []
 
@@ -124,6 +130,7 @@ def get_detailed_forecast_by_city(city, unit_var):
         return forecast_points
 
     except Exception as e:
+        logger.error(str(e))
         return {"error": str(e)}
 
 

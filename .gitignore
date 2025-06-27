@@ -206,3 +206,6 @@ favourites.json
 
 #Ignore any exported executable
 .exe
+
+#Logs
+logs/

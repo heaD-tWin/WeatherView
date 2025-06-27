@@ -107,6 +107,7 @@ WeatherView/
 ├── favourites.py
 ├── themes.py
 ├── utils.py
+├── logger.py
 ├── weather_icons/           # Icon assets
 ├── favourites.json          # Saved city list (ignored in Git)
 ├── requirements.txt

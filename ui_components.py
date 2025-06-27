@@ -3,8 +3,9 @@ import tkinter as tk
 from tkinter import ttk
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import datetime
 from PIL import Image, ImageTk
+from logger import logger
 from weather_api import get_weather_by_city, get_forecast_by_city, get_detailed_forecast_by_city
 from themes import set_dynamic_background
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -17,11 +18,12 @@ def handle_search(ui, unit_var):
     ui["status_label"].config(text="Loading...", foreground="black")
     ui["status_label"].update_idletasks()
     ui["search_button"].config(state="disabled")
+    logger.info(f"Searching for location: {city}")
 
     error_type = None
 
+    #---Current Weather---
     try:
-        #---Current Weather---
         result = get_weather_by_city(city, unit)
         if "error" in result:
             if "Location" in result["error"]:
@@ -56,8 +58,11 @@ def handle_search(ui, unit_var):
                 ui["icon_label"].config(image="")
         else:
             ui["icon_label"].config(image="")
-        
-        #---Forecast---
+    except:
+        logger.error("Failed to retrieve Current Weather from API")
+
+     #---Forecast---
+    try:
         container = ui["forecast_cards_container"]
         for widget in container.winfo_children():
                 widget.destroy()
@@ -89,6 +94,7 @@ def handle_search(ui, unit_var):
                         ttk.Label(card, text=day["date"], font=("Segoe UI", 10)).pack(anchor="w", padx=5)
                     except Exception as e:
                         ttk.Label(card, text=day["date"], font=("Segoe UI", 10, "bold")).pack(anchor="w", padx=5)
+                        logger.debug(f"Could not set day for forecast card: {type(e).__name__} - {e}")
 
                     try:
                         icon_code = day['icon']
@@ -106,16 +112,16 @@ def handle_search(ui, unit_var):
                         icon_label = ttk.Label(card, image=icon_img)
                         icon_label.image = icon_img
                         icon_label.pack(pady=5)
-                    except Exception as e:
-                        ttk.Label(card, text="(icon)").pack(side="left", padx=5)
+                        logger.debug(f"Could not set icon for forecast card: {type(e).__name__} - {e}")
 
                     try:
                         temp_text = f"{day["min_temp"]}/{day["max_temp"]}{unit_symbol}"
                         ttk.Label(card, text=temp_text, font=("Segoe UI", 10, "bold")).pack(anchor="center", pady=(5, 0))
                     except Exception as e:
                         ttk.Label(card, text=day["temperature"], font=("Segoe UI", 10, "bold")).pack(anchor="w")
+                        logger.debug(f"Could not set temperature for forecast card: {type(e).__name__} - {e}")
     except Exception as e:
-        pass    #Exception handled in 'Update UI' block
+        logger.error("Failed to retrieve Forecast from API")  
     
     #---Detailed Forecast---
     if "error" not in result and "error" not in forecast:
@@ -127,6 +133,7 @@ def handle_search(ui, unit_var):
                 embed_chart(ui, fig)
         except Exception as e:
             error_type = "Could not graph Forecast"
+            logger.error(f"Could not graph Forecast: {type(e).__name__} - {e}")
             for widget in ui["chart_frame"].winfo_children():
                 widget.destroy()
     else:
@@ -140,6 +147,7 @@ def handle_search(ui, unit_var):
         ui["unit_toggle_button"].config(state="enabled")
         ui["status_label"].config(text="")
     except Exception as e:
+        logger.error(f"Could not update UI: {type(e).__name__} - {e}")
         ui["status_label"].config(text=error_type, foreground="red")
         ui["save_button"].config(state="disabled")
         ui["unit_toggle_button"].config(state="disabled")
@@ -162,14 +170,6 @@ def build_ui(parent, unit_var):
     parent.title("Weather View")
     parent.geometry("820x620+100+50")
     parent.resizable(False, False)
-
-    try:
-        icon_path = resource_path(os.path.join("weather_icons", f"{icon_code}.png"))
-        icon_image = Image.open(icon_path)
-        icon_photo = ImageTk.PhotoImage(icon_image)
-        parent.iconphoto(False, icon_photo)
-    except Exception as e:
-        pass
 
     #---FRAME: Current Weather---
     current_weather_frame = tk.Frame(parent)
@@ -298,6 +298,7 @@ def load_weather_icon(icon_code, size=(150, 150)):
         image = Image.open(icon_path).resize(size, Image.LANCZOS)
         return ImageTk.PhotoImage(image)
     except Exception as e:
+        logger.error(f"Could load Icon: {e}")
         return None
 
 def embed_chart(ui, fig, retry_delay=50, max_attempts=20, attempt=0):

@@ -8,6 +8,7 @@ from ui_components import build_ui, handle_search, start_auto_refresh, focus_sea
 from geolocation import get_user_city
 from favourites import  load_favourites
 from utils import on_save_favourite, update_fav_button
+from logger import logger
  
 def on_select_favourite(ui, unit_var):
     selected_city = ui["favourites_dropdown"].get()
@@ -17,7 +18,12 @@ def on_select_favourite(ui, unit_var):
         handle_search(ui, unit_var)
         update_fav_button(ui)
 
+def on_close(root):
+    logger.info("Application closed by user.")
+    root.destroy()
+
 def main():
+    logger.info("Weather View started")
     root = tk.Tk()
     root.withdraw()
 
@@ -43,6 +49,7 @@ def main():
     ui["root"].after(100, lambda: focus_search_entry(ui))
 
     root.deiconify()
+    root.protocol("WM_DELETE_WINDOW", lambda: on_close(root))
     root.mainloop()
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@ import certifi
 import os
 import sys
 from dotenv import load_dotenv
+from logger import logger
 
 if getattr(sys, 'frozen', False):
     env_path = os.path.join(os.path.dirname(sys.executable), ".env")
@@ -33,7 +34,7 @@ def get_user_city():
             return city
 
     except Exception as e:
-        pass
+        logger.error(f"Could not retrieve geolocation: {type(e).__name__} - {e}")
 
     return None
 
