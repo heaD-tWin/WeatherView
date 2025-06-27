@@ -137,10 +137,4 @@ Email: danwhite1984@live.com.au
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
----
 
-Let me know if you want to:
-
-- Customize your GitHub link and author contact  
-- Add sample screenshots or badges  
-- Include instructions for hosting or demoing the `.exe` externally

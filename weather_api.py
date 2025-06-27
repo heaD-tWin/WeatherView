@@ -24,7 +24,7 @@ def get_weather_by_city(city, unit_var):
         data = response.json()
         
         if data.get("cod") != 200:
-            return {"error": "City not found."}
+            return {"error": "Location not found."}
 
         timestamp = data.get("dt")
         if timestamp:

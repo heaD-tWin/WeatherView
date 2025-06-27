@@ -14,23 +14,31 @@ from utils import update_fav_button
 def handle_search(ui, unit_var):
     city = ui["search_entry"].get()
     unit = unit_var.get()
-    ui["status_label"].config(text="Loading...")
+    ui["status_label"].config(text="Loading...", foreground="black")
     ui["status_label"].update_idletasks()
     ui["search_button"].config(state="disabled")
 
+    error_type = None
+
     try:
+        #---Current Weather---
         result = get_weather_by_city(city, unit)
-        if not result:
-            ui["status_label"].config(text=f"Error: Could not fetch weather for '{city}'.")
-            ui["city_label"].config(text="City: Not found")
+        if "error" in result:
+            if "Location" in result["error"]:
+                ui["city_label"].config(text="City: Not found", foreground="red")
+                error_type = "Bad Location"
+            else:
+                error_type = "Network Not Found"
+                ui["city_label"].config(text="No Network", foreground="red")
             ui["temp_label"].config(text="Temperature: —")
             ui["condition_label"].config(text="Condition: —")
             ui["humidity_label"].config(text="Humidity: —")
             ui["wind_label"].config(text="Wind Speed: —")
             ui["icon_label"].config(image="")
+            icon_code = "error"
         else:
             unit_symbol = "°C" if unit == "metric" else "°F"
-            ui["city_label"].config(text=f"{result['city']}")
+            ui["city_label"].config(text=f"{result['city']}", foreground="black")
             ui["temp_label"].config(text=f"Temperature: {result['temperature']}{unit_symbol}")
             ui["condition_label"].config(text=f"Condition: {result['condition']}")
             ui["humidity_label"].config(text=f"Humidity: {result['humidity']}%")
@@ -39,91 +47,100 @@ def handle_search(ui, unit_var):
             bg, border, light = set_dynamic_background(ui["root"], result["condition"])
 
             icon_code = result.get("icon")
-            if icon_code:
-                photo = load_weather_icon(icon_code, size=(150, 150))
-                if photo:
-                    ui["icon_label"].config(image=photo)
-                    ui["icon_label"].image = photo
-                else:
-                    ui["icon_label"].config(image="")
+        if icon_code:
+            photo = load_weather_icon(icon_code, size=(150, 150))
+            if photo:
+                ui["icon_label"].config(image=photo)
+                ui["icon_label"].image = photo
             else:
                 ui["icon_label"].config(image="")
-        forecast = get_forecast_by_city(city, unit)
-        container = ui["forecast_cards_container"]
-        detailed_forecast = get_detailed_forecast_by_city(city, unit)
-
-        for widget in container.winfo_children():
-            widget.destroy()
-        
-        if isinstance(forecast, dict) and "error" in forecast:
-            ttk.Label(container, text=forecast["error"]).pack()
-            ui["status_label"].config(text=f"Error: {forecast['error']}")
         else:
-            ui["status_label"].config(text="")
-            forecast_icons = []
-            for i, day in enumerate(forecast):
-                card = tk.Frame(
-                    container,
-                    relief="flat",
-                    highlightbackground=border,
-                    highlightthickness=1,
-                    bg=bg,
-                    width=150,
-                    height=155
-                )
-                card.pack_propagate(False)
-                card.grid(row=0, column=i, padx=5, pady=5)
+            ui["icon_label"].config(image="")
+        
+        #---Forecast---
+        container = ui["forecast_cards_container"]
+        for widget in container.winfo_children():
+                widget.destroy()
 
-                try:
-                    date_obj = datetime.datetime.strptime(day["date"], "%Y-%m-%d")
-                    day_name = date_obj.strftime("%A")
-                    ttk.Label(card, text=day_name, font=("Segoe UI", 13, "bold")).pack(anchor="w", padx=5)
-                    ttk.Label(card, text=day["date"], font=("Segoe UI", 10)).pack(anchor="w", padx=5)
-                except Exception as e:
-                    ttk.Label(card, text=day["date"], font=("Segoe UI", 10, "bold")).pack(anchor="w", padx=5)
+        if "error" not in result:
+            forecast = get_forecast_by_city(city, unit)
+        
+            if isinstance(forecast, dict) and "error" in forecast:
+                error_type = "Could not get Forecast"
+            else:
+                forecast_icons = []
+                for i, day in enumerate(forecast):
+                    card = tk.Frame(
+                        container,
+                        relief="flat",
+                        highlightbackground=border,
+                        highlightthickness=1,
+                        bg=bg,
+                        width=150,
+                        height=155
+                    )
+                    card.pack_propagate(False)
+                    card.grid(row=0, column=i, padx=5, pady=5)
 
-                try:
-                    icon_code = day['icon']
-                    icon_path = resource_path(os.path.join("weather_icons", f"{icon_code}.png"))
-                    img = Image.open(icon_path).resize((60, 60), Image.LANCZOS)
-                    icon_img = ImageTk.PhotoImage(img)
-                    forecast_icons.append(icon_img)
-                    icon_label = ttk.Label(card, image=icon_img)
-                    icon_label.image = icon_img
-                    icon_label.pack(pady=5)
-                except Exception as e:
-                    ttk.Label(card, text="(icon)").pack(pady=5)
-                    icon_img = ImageTk.PhotoImage(img)
-                    forecast_icons.append(icon_img)
-                    icon_label = ttk.Label(card, image=icon_img)
-                    icon_label.image = icon_img
-                    icon_label.pack(pady=5)
-                except Exception as e:
-                    ttk.Label(card, text="(icon)").pack(side="left", padx=5)
+                    try:
+                        date_obj = datetime.datetime.strptime(day["date"], "%Y-%m-%d")
+                        day_name = date_obj.strftime("%A")
+                        ttk.Label(card, text=day_name, font=("Segoe UI", 13, "bold")).pack(anchor="w", padx=5)
+                        ttk.Label(card, text=day["date"], font=("Segoe UI", 10)).pack(anchor="w", padx=5)
+                    except Exception as e:
+                        ttk.Label(card, text=day["date"], font=("Segoe UI", 10, "bold")).pack(anchor="w", padx=5)
 
-                try:
-                    temp_text = f"{day["min_temp"]}/{day["max_temp"]}{unit_symbol}"
-                    ttk.Label(card, text=temp_text, font=("Segoe UI", 10, "bold")).pack(anchor="center", pady=(5, 0))
-                except Exception as e:
-                    ttk.Label(card, text=day["temperature"], font=("Segoe UI", 10, "bold")).pack(anchor="w")
+                    try:
+                        icon_code = day['icon']
+                        icon_path = resource_path(os.path.join("weather_icons", f"{icon_code}.png"))
+                        img = Image.open(icon_path).resize((60, 60), Image.LANCZOS)
+                        icon_img = ImageTk.PhotoImage(img)
+                        forecast_icons.append(icon_img)
+                        icon_label = ttk.Label(card, image=icon_img)
+                        icon_label.image = icon_img
+                        icon_label.pack(pady=5)
+                    except Exception as e:
+                        ttk.Label(card, text="(icon)").pack(pady=5)
+                        icon_img = ImageTk.PhotoImage(img)
+                        forecast_icons.append(icon_img)
+                        icon_label = ttk.Label(card, image=icon_img)
+                        icon_label.image = icon_img
+                        icon_label.pack(pady=5)
+                    except Exception as e:
+                        ttk.Label(card, text="(icon)").pack(side="left", padx=5)
+
+                    try:
+                        temp_text = f"{day["min_temp"]}/{day["max_temp"]}{unit_symbol}"
+                        ttk.Label(card, text=temp_text, font=("Segoe UI", 10, "bold")).pack(anchor="center", pady=(5, 0))
+                    except Exception as e:
+                        ttk.Label(card, text=day["temperature"], font=("Segoe UI", 10, "bold")).pack(anchor="w")
     except Exception as e:
-        pass
-
-    try:
-        detailed_forecast = get_detailed_forecast_by_city(city, unit,)
+        pass    #Exception handled in 'Update UI' block
     
-        if isinstance(detailed_forecast, list) and detailed_forecast:
-            fig = create_forecast_figure(detailed_forecast, city, bg, border, light, unit)
-            embed_chart(ui, fig)
-    except Exception as e:
-        pass
-
+    #---Detailed Forecast---
+    if "error" not in result and "error" not in forecast:
+        try:
+            detailed_forecast = get_detailed_forecast_by_city(city, unit,)
+    
+            if isinstance(detailed_forecast, list) and detailed_forecast:
+                fig = create_forecast_figure(detailed_forecast, city, bg, border, light, unit)
+                embed_chart(ui, fig)
+        except Exception as e:
+            error_type = "Could not graph Forecast"
+            for widget in ui["chart_frame"].winfo_children():
+                widget.destroy()
+    else:
+        for widget in ui["chart_frame"].winfo_children():
+            widget.destroy()
+    
+    #---Update UI---
     try:
         set_dynamic_background(ui["root"], result["condition"])
         ui["save_button"].config(state="enabled")
         ui["unit_toggle_button"].config(state="enabled")
+        ui["status_label"].config(text="")
     except Exception as e:
-        ui["status_label"].config(text="Bad Location.", foreground="red")
+        ui["status_label"].config(text=error_type, foreground="red")
         ui["save_button"].config(state="disabled")
         ui["unit_toggle_button"].config(state="disabled")
 
@@ -132,6 +149,7 @@ def handle_search(ui, unit_var):
 
     update_fav_button(ui)
     ui["search_entry_highlighted"] = False
+
 
 def build_ui(parent, unit_var):
     def toggle_units():

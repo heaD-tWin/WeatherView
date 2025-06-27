@@ -195,6 +195,8 @@ cython_debug/
 
 #Visual Studio’s hidden workspace folder
 .vs/
+*.pyproj
+*.sln
 
 #API key and User email
 .env
