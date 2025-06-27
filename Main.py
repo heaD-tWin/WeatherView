@@ -31,6 +31,9 @@ def main():
         ui["search_entry"].insert(0, user_city)
         handle_search(ui, unit_var)
         update_fav_button(ui)
+    else:
+        ui["search_entry"].delete(0, tk.END)
+        handle_search(ui, unit_var)
 
     favourites = load_favourites()
     ui["favourites_dropdown"]["values"] = favourites
