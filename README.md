@@ -16,10 +16,11 @@ A sleek, interactive desktop weather dashboard built with **Python**, **Tkinter*
 
 ## 📸 Screenshots
 
-| Melbourn | New York |
-| :---: | :---: |
-| ![Weather Melbourn: clear sky)](./assets/WVScreenshot1.png) | ![Weather New York: mist](./assets/WVScreenshot2.png) |
-
+<p align="center">
+  <img src="./assets/WVScreenshot1.png" alt="Weather Melbourne: clear sky" width="400" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="./assets/WVScreenshot2.png" alt="Weather New York: mist" width="400" />
+</p>
 ---
 
 ## ✨ Features
@@ -103,25 +104,47 @@ pyinstaller --clean --onefile --noconsole --add-data "weather_icons;weather_icon
 
 ---
 
+## 🧪 Testing
+
+This project includes a comprehensive test suite built with **pytest**. The tests use mocking to ensure that application logic can be verified without making live network calls.
+
+To run the tests, execute the following command from the project's root directory:
+
+```bash
+pytest tests/
+```
+
+All 28 tests should pass, confirming that the application's core logic, API handling, and utility functions are working as expected.
+
+---
+
 ## 📁 Project Structure
 
 ```
-WeatherView/
-├── main.py
-├── weather_api.py
-├── geolocation.py
-├── ui_components.py
-├── graph_forecast.py
-├── favourites.py
-├── themes.py
-├── utils.py
-├── logger.py
-├── weather_icons/           # Icon assets
-├── favourites.json          # Saved city list (ignored in Git)
-├── requirements.txt
-├── .env.example             # Template for environment config
-├── README.md
-└── .gitignore
+WeatherView/ 
+├── main.py                 # Main application entry point 
+├── weather_api.py          # Handles calls to the OpenWeatherMap API 
+├── geolocation.py          # Determines user's city via IP address 
+├── ui_components.py        # Builds and manages all UI elements 
+├── graph_forecast.py       # Creates the Matplotlib forecast graph 
+├── favourites.py           # Manages saving/loading of favourite cities 
+├── themes.py               # Manages dynamic background colors 
+├── utils.py                # Utility functions for UI interaction 
+├── logger.py               # Configures application-wide logging 
+│ ├── assets/               # Screenshots and other assets 
+│   └── ... 
+│ ├── tests/ 
+│   ├── test_favourites.py 
+│   ├── test_main.py 
+│   ├── test_ui_components.py 
+│   ├── test_utils.py 
+│   └── test_weather_api.py 
+│ ├── weather_icons/        # Weather icon image assets 
+│ ├── favourites.json       # Saved city list (ignored by Git) 
+├── requirements.txt        # Project dependencies 
+├── .env.example            # Template for environment variables 
+├── README.md               # This file 
+└── .gitignore              # Specifies files to be ignored by Git
 ```
 
 ---
