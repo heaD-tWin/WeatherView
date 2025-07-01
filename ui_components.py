@@ -1,4 +1,3 @@
-
 import tkinter as tk
 from tkinter import ttk
 import os
@@ -13,6 +12,17 @@ from graph_forecast import create_forecast_figure
 from utils import update_fav_button
 
 def handle_search(ui, unit_var):
+    """
+    Main function to fetch and display weather data for a given city.
+
+    This function orchestrates the entire data retrieval and UI update process.
+    It fetches current weather, 5-day forecast, and detailed forecast data,
+    then updates all relevant UI components, including labels, icons, and graphs.
+
+    Args:
+        ui (dict): A dictionary of UI widget references.
+        unit_var (tk.StringVar): The Tkinter variable holding the unit system ('metric' or 'imperial').
+    """
     city = ui["search_entry"].get()
     unit = unit_var.get()
     ui["status_label"].config(text="Loading...", foreground="black")
@@ -302,7 +312,20 @@ def load_weather_icon(icon_code, size=(150, 150)):
         return None
 
 def embed_chart(ui, fig, retry_delay=50, max_attempts=20, attempt=0):
+    """
+    Embeds a Matplotlib figure into the Tkinter chart frame.
 
+    This function includes a retry mechanism using `frame.after()` because
+    the frame's dimensions may not be immediately available when the UI is
+    first drawn, which can cause rendering issues.
+
+    Args:
+        ui (dict): The dictionary of UI widget references.
+        fig (matplotlib.figure.Figure): The figure object to embed.
+        retry_delay (int): The delay in milliseconds between retry attempts.
+        max_attempts (int): The maximum number of attempts to make.
+        attempt (int): The current attempt number.
+    """
     frame = ui["chart_frame"]
 
     if frame.winfo_ismapped() and frame.winfo_width() > 1:
@@ -323,6 +346,15 @@ def focus_search_entry(ui_refs):
     ui_refs["search_entry_highlighted"] = False
 
 def resource_path(relative_path):
+    """
+    Get the absolute path to a resource, works for dev and for PyInstaller.
+
+    Args:
+        relative_path (str): The path to the resource relative to the project root.
+
+    Returns:
+        str: The absolute path to the resource.
+    """
     if hasattr(sys, '_MEIPASS'):
         return os.path.join(sys._MEIPASS, relative_path)
     return os.path.join(os.path.abspath("."), relative_path)

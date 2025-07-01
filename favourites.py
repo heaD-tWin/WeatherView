@@ -5,6 +5,15 @@ from logger import logger
 FAVOURITES_FILE = "favourites.json"
 
 def save_favourite(city):
+    """
+    Saves or removes a city from the favourites list.
+
+    This function acts as a toggle. If the city is not in the favourites,
+    it is added. If it already exists, it is removed.
+
+    Args:
+        city (str): The name of the city to save or remove.
+    """
     if not isinstance(city, str):
         logger.warning(f"Attempted to save non-string favourite: {city}")
         return
@@ -31,6 +40,13 @@ def save_favourite(city):
         logger.error(f"Failed to save favourite '{city}': {type(e).__name__} - {e}")
 
 def load_favourites():
+    """
+    Loads the list of favourite cities from the JSON file.
+
+    Returns:
+        list: A list of favourite cities, or an empty list if the file
+              doesn't exist or an error occurs.
+    """
     if os.path.exists(FAVOURITES_FILE):
         try:
             with open(FAVOURITES_FILE, "r") as f:

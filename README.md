@@ -14,6 +14,14 @@ A sleek, interactive desktop weather dashboard built with **Python**, **Tkinter*
 
 ---
 
+## 📸 Screenshots
+
+| Melbourn | New York |
+| :---: | :---: |
+| ![Weather Melbourn: clear sky)](./assets/WVScreenshot1.png) | ![Weather New York: mist](./assets/WVScreenshot2.png) |
+
+---
+
 ## ✨ Features
 
 - 🔍 Search by city name

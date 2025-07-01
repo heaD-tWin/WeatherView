@@ -16,6 +16,15 @@ if not EMAIL:
     raise ValueError("GEOPY_USER_AGENT_EMAIL is not set in your .env file.")
 
 def get_user_city():
+    """
+    Retrieves the user's current city based on their public IP address.
+
+    This function first determines the IP address to get geographic coordinates,
+    then uses a reverse geocoding service to find the city name.
+
+    Returns:
+        str | None: The user's city name, or None if it cannot be determined.
+    """
     try:
         ip_response = requests.get("https://ipinfo.io/json", verify=certifi.where())
         location_data = ip_response.json()
@@ -24,7 +33,7 @@ def get_user_city():
         if loc:
             lat, lon = loc.split(",")
             url = f"https://nominatim.openstreetmap.org/reverse?lat={lat}&lon={lon}&format=json&accept-language=en&addressdetails=1"
-            headers = {"User-Agent": "weather_dashboard (EMAIL)"}
+            headers = {"User-Agent": f"weather_dashboard ({EMAIL})"}
             response = requests.get(url, headers=headers, verify=certifi.where())
             response.raise_for_status()
             data = response.json()
