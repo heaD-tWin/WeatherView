@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.993" timestamp="2025-07-01T20:25:46.612131+10:00" hostname="DESKTOP-0Q8HRTN"><testcase classname="tests.test_weather_api" name="test_get_weather_by_city_request_fails" file="tests\test_weather_api.py" line="55" time="0.006"><failure message="AssertionError: assert 'Location not found.' == 'Request failed.'&#10;  &#10;  - Request failed.&#10;  + Location not found.">mock_requests_get = &lt;MagicMock name='get()' id='1326704299040'&gt;
+
+    def test_get_weather_by_city_request_fails(mock_requests_get):
+        """
+        Tests handling of a network failure during the API request.
+        """
+        mock_requests_get.side_effect = Exception("Network Error")
+    
+        result = weather_api.get_weather_by_city("London", "metric")
+    
+        assert "error" in result
+&gt;       assert result["error"] == "Request failed."
+E       AssertionError: assert 'Location not found.' == 'Request failed.'
+E         
+E         - Request failed.
+E         + Location not found.
+
+tests\test_weather_api.py:65: AssertionError</failure><system-out>--------------------------------- Captured Log ---------------------------------
+ERROR    WeatherViewLogger:weather_api.py:29 Could not find location in get_weather_by_city
+--------------------------------- Captured Out ---------------------------------
+
+</system-out><system-err>--------------------------------- Captured Err ---------------------------------
+
+</system-err></testcase></testsuite></testsuites>
