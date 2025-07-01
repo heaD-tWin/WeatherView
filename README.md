@@ -17,9 +17,9 @@ A sleek, interactive desktop weather dashboard built with **Python**, **Tkinter*
 ## 📸 Screenshots
 
 <p align="center">
-  <img src="./assets/WVScreenshot1.png" alt="Weather Melbourne: clear sky" width="400" />
+  <img src="./screenshots/WVScreenshot1.png" alt="Weather Melbourne: clear sky" width="400" />
   &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="./assets/WVScreenshot2.png" alt="Weather New York: mist" width="400" />
+  <img src="./screenshots/WVScreenshot2.png" alt="Weather New York: mist" width="400" />
 </p>
 
 ---
@@ -115,7 +115,7 @@ To run the tests, execute the following command from the project's root director
 pytest tests/
 ```
 
-All 28 tests should pass, confirming that the application's core logic, API handling, and utility functions are working as expected.
+All 33 tests should pass, confirming that the application's core logic, API handling, and utility functions are working as expected.
 
 ---
 
@@ -132,7 +132,7 @@ WeatherView/
 ├── themes.py               # Manages dynamic background colors 
 ├── utils.py                # Utility functions for UI interaction 
 ├── logger.py               # Configures application-wide logging 
-│ ├── assets/               # Screenshots and other assets 
+│ ├── screenshots/          # Screenshots
 │   └── ... 
 │ ├── tests/ 
 │   ├── test_favourites.py 
