@@ -21,6 +21,7 @@ A sleek, interactive desktop weather dashboard built with **Python**, **Tkinter*
   &nbsp;&nbsp;&nbsp;&nbsp;
   <img src="./assets/WVScreenshot2.png" alt="Weather New York: mist" width="400" />
 </p>
+
 ---
 
 ## ✨ Features
